@@ -3,81 +3,63 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>CreeperBET - Apostas para Crianças</title>
+    <title>CreeperBET</title>
+    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
-
         body {
-            background: linear-gradient(145deg, #662d91, #2b86c5);
+            background-image: url('https://media.istockphoto.com/id/1305302109/vector/pixel-minecraft-style-land-background-concept-of-game-ground-pixelated-horizontal-background.jpg?s=170667a&w=0&k=20&c=97gF5OJ9RXsg2AZkqWDdKqzr7Ynsc2uWBqfOJuKAXyA=');
+            background-size: cover;
+            background-position: center;
+            font-family: 'Minecraftia', sans-serif;
             color: #fff;
-            font-family: 'Fredoka One', cursive;
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
         }
-        img.logo {
-            width: 300px;
-            margin-bottom: 20px;
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 600px;
+            margin: auto;
         }
         h1 {
-            color: #ffe600;
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        p.subtitle {
-            font-size: 20px;
-            color: #ffffff;
-            margin-bottom: 30px;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #00ff00;
         }
         .btn {
             display: block;
-            background-color: #ffe600;
-            color: #2b2b2b;
-            padding: 15px 30px;
-            margin: 15px auto;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            width: 300px;
-            box-shadow: 0 4px #c9b100;
-            transition: 0.2s;
+            background-color: #00aa00;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 18px;
+            border-radius: 8px;
+            transition: background 0.2s;
         }
         .btn:hover {
-            background-color: #fff159;
-        }
-        .depoimento {
-            margin-top: 40px;
-            font-style: italic;
-            font-size: 18px;
-            color: #f0f0f0;
+            background-color: #009900;
         }
         footer {
-            margin-top: 60px;
-            font-size: 14px;
-            color: #ddd;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #ccc;
         }
     </style>
 </head>
 <body>
-    <img src="logo.png" alt="CreeperBET Logo" class="logo">
-    <h1>CREEPERBET</h1>
-    <p class="subtitle">A primeira casa de apostas feita para crianças (só que não 😂)</p>
-
-    <button class="btn" onclick="location.href='aposta.html'">🧨 Aviãozinho do Creeper</button>
-    <button class="btn" onclick="location.href='aposta.html'">🪙 Slot Mine</button>
-    <button class="btn" onclick="location.href='aposta.html'">🧑‍🌾 Roleta da Aldeia</button>
-    <button class="btn" onclick="location.href='aposta.html'">🎮 Apostar no BedWars Ao Vivo</button>
-    <button class="btn" onclick="location.href='aposta.html'">🔮 Tônigon vai postar vídeo?</button>
-    <button class="btn" onclick="location.href='aposta.html'">🔐 Entrar com Conta Mojang</button>
-
-    <div class="depoimento">
-        <p>“Ganhei 400 reais em Robux!” – pedrinhogamer34</p>
-        <p>“Perdi minha mochila, mas valeu a pena!” – lucasXD_pvp</p>
+    <div class="container">
+        <h1>CREEPERBET</h1>
+        <a class="btn" href="aposta.html">🧨 Aviãozinho do Creeper</a>
+        <a class="btn" href="aposta.html">🎰 Slot Mine</a>
+        <a class="btn" href="aposta.html">🧑‍🌾 Roleta da Aldeia</a>
+        <a class="btn" href="aposta.html">🎮 BedWars Ao Vivo</a>
+        <a class="btn" href="aposta.html">🔮 Tônigon vai postar vídeo?</a>
+        <a class="btn" href="aposta.html">🔐 Entrar com Conta Mojang</a>
+        <footer>
+            Nenhum aldeão foi machucado durante a criação deste site. © 2025 CreeperBET
+        </footer>
     </div>
-
-    <footer>
-        Nenhum diamante foi ferido nesse processo. © 2025 CreeperBET
-    </footer>
 </body>
 </html>
