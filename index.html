@@ -2,64 +2,85 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>CreeperBET</title>
-    <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-    <style>
-        body {
-            background-image: url('https://media.istockphoto.com/id/1305302109/vector/pixel-minecraft-style-land-background-concept-of-game-ground-pixelated-horizontal-background.jpg?s=170667a&w=0&k=20&c=97gF5OJ9RXsg2AZkqWDdKqzr7Ynsc2uWBqfOJuKAXyA=');
-            background-size: cover;
-            background-position: center;
-            font-family: 'Minecraftia', sans-serif;
-            color: #fff;
-            text-align: center;
-            padding: 60px 20px;
-        }
-        .container {
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 16px;
-            max-width: 600px;
-            margin: auto;
-        }
-        h1 {
-            font-size: 36px;
-            margin-bottom: 20px;
-            color: #00ff00;
-        }
-        .btn {
-            display: block;
-            background-color: #00aa00;
-            color: white;
-            text-decoration: none;
-            padding: 15px;
-            margin: 15px 0;
-            font-size: 18px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background-color: #009900;
-        }
-        footer {
-            margin-top: 40px;
-            font-size: 12px;
-            color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>CreeperBET</title>
+  <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
+  <style>
+    body {
+      background-image: url('https://media.istockphoto.com/id/1305302109/vector/pixel-minecraft-style-land-background-concept-of-game-ground-pixelated-horizontal-background.jpg?s=170667a&w=0&k=20&c=97gF5OJ9RXsg2AZkqWDdKqzr7Ynsc2uWBqfOJuKAXyA=');
+      background-size: cover;
+      background-position: center;
+      font-family: 'Minecraftia', sans-serif;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #00ff00;
+      font-size: 36px;
+    }
+    .wallet {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #333;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      z-index: 10;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.8);
+      max-width: 600px;
+      margin: 60px auto;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+    }
+    .btn {
+      display: block;
+      background-color: #00aa00;
+      color: white;
+      padding: 15px;
+      margin: 15px 0;
+      font-size: 18px;
+      text-decoration: none;
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+    .btn:hover {
+      background-color: #009900;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      color: #ccc;
+      font-size: 12px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>CREEPERBET</h1>
-        <a class="btn" href="aposta.html">🧨 Aviãozinho do Creeper</a>
-        <a class="btn" href="aposta.html">🎰 Slot Mine</a>
-        <a class="btn" href="aposta.html">🧑‍🌾 Roleta da Aldeia</a>
-        <a class="btn" href="aposta.html">🎮 BedWars Ao Vivo</a>
-        <a class="btn" href="aposta.html">🔮 Tônigon vai postar vídeo?</a>
-        <a class="btn" href="aposta.html">🔐 Entrar com Conta Mojang</a>
-        <footer>
-            Nenhum aldeão foi machucado durante a criação deste site. © 2025 CreeperBET
-        </footer>
-    </div>
+  <div class="wallet">
+    💎 Diamantes: <span id="diamantes">100</span>
+  </div>
+  <div class="header">
+    <h1>CREEPERBET</h1>
+  </div>
+  <div class="container">
+    <a class="btn" href="aviao.html">🧨 Aviãozinho do Creeper</a>
+    <a class="btn" href="slot.html">🎰 Slot Mine</a>
+    <a class="btn" href="aldeia.html">🧑‍🌾 Roleta da Aldeia</a>
+    <a class="btn" href="tempo-real.html">🕒 Apostas em Tempo Real</a>
+    <a class="btn" href="comprar.html">💳 Comprar Diamantes</a>
+    <a class="btn" href="sacar.html">🏦 Sacar Robux/Minecoins/V-Bucks</a>
+  </div>
+  <div class="footer">
+    Nenhum aldeão foi machucado durante a criação deste site. © 2025 CreeperBET
+  </div>
 </body>
 </html>
