@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diamond Crash - CreeperBet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Minecraftia&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        .game-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .game-area {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            border: 2px solid #4CAF50;
+            margin: 2rem 0;
+        }
+
+        .steve-container {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .steve {
+            font-size: 80px;
+            animation: mine 0.5s infinite;
+        }
+
+        .diamond-count {
+            font-size: 2rem;
+            color: #4CAF50;
+            margin: 1rem 0;
+        }
+
+        .multiplier {
+            font-size: 1.5rem;
+            color: #ffd700;
+            margin: 1rem 0;
+        }
+
+        .bet-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .bet-amount {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #4CAF50;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            width: 150px;
+            text-align: center;
+        }
+
+        .bet-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .bet-button:hover {
+            background: #45a049;
+        }
+
+        .cashout-button {
+            background: #ffd700;
+            color: black;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .cashout-button:hover {
+            background: #ffed4a;
+        }
+
+        @keyframes mine {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        .lava {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: linear-gradient(to bottom, #ff4500, #ff0000);
+            border-radius: 0 0 4px 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="diamond-balance" onclick="showDiamondShop()">
+        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Diamond_JE2_BE2.png/revision/latest?cb=20200128025341" alt="Diamond">
+        <span id="diamond-balance">1000</span>
+    </div>
+
+    <header>
+        <a href="../index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+        <h1>Diamond Crash</h1>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div class="game-area">
+                <div class="steve-container">
+                    <div class="steve">⛏️</div>
+                    <div class="lava"></div>
+                </div>
+                <div class="diamond-count">Diamantes: 0</div>
+                <div class="multiplier">Multiplicador: x1.00</div>
+            </div>
+
+            <div class="bet-controls">
+                <input type="number" id="betAmount" class="bet-amount" placeholder="Quantidade de diamantes" min="1">
+                <button class="bet-button" onclick="startGame()">Iniciar</button>
+                <button class="cashout-button" onclick="cashout()">Retirar</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="shared.js"></script>
+    <script>
+        let currentBet = 0;
+        let currentMultiplier = 1;
+        let gameInterval;
+        let isGameRunning = false;
+
+        function startGame() {
+            if (isGameRunning) return;
+
+            const betAmount = parseInt(document.getElementById('betAmount').value);
+            if (!betAmount || betAmount <= 0) {
+                alert('Digite uma quantidade válida de diamantes!');
+                return;
+            }
+
+            if (betAmount > getDiamondBalance()) {
+                alert('Saldo insuficiente!');
+                return;
+            }
+
+            currentBet = betAmount;
+            currentMultiplier = 1;
+            isGameRunning = true;
+            updateDiamondBalance(-betAmount);
+
+            document.querySelector('.bet-button').style.display = 'none';
+            document.querySelector('.cashout-button').style.display = 'inline-block';
+            document.getElementById('betAmount').disabled = true;
+
+            gameInterval = setInterval(() => {
+                currentMultiplier += 0.1;
+                document.querySelector('.diamond-count').textContent = `Diamantes: ${Math.floor(currentMultiplier * currentBet)}`;
+                document.querySelector('.multiplier').textContent = `Multiplicador: x${currentMultiplier.toFixed(2)}`;
+
+                if (Math.random() < 0.1) {
+                    crash();
+                }
+            }, 100);
+        }
+
+        function cashout() {
+            if (!isGameRunning) return;
+
+            clearInterval(gameInterval);
+            isGameRunning = false;
+            const winnings = Math.floor(currentMultiplier * currentBet);
+            updateDiamondBalance(winnings);
+            alert(`Você ganhou ${winnings} diamantes!`);
+
+            document.querySelector('.bet-button').style.display = 'inline-block';
+            document.querySelector('.cashout-button').style.display = 'none';
+            document.getElementById('betAmount').disabled = false;
+            document.querySelector('.diamond-count').textContent = 'Diamantes: 0';
+            document.querySelector('.multiplier').textContent = 'Multiplicador: x1.00';
+        }
+
+        function crash() {
+            if (!isGameRunning) return;
+
+            clearInterval(gameInterval);
+            isGameRunning = false;
+            alert('Steve caiu na lava! Você perdeu!');
+
+            document.querySelector('.bet-button').style.display = 'inline-block';
+            document.querySelector('.cashout-button').style.display = 'none';
+            document.getElementById('betAmount').disabled = false;
+            document.querySelector('.diamond-count').textContent = 'Diamantes: 0';
+            document.querySelector('.multiplier').textContent = 'Multiplicador: x1.00';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreeperBet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="games/shared.css">
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('fonts/Minecraft.ttf') format('truetype');
+        }
+
+        * {
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        body {
+            font-family: 'Minecraft', sans-serif !important;
+            background: #1a1a1a url('https://preview.redd.it/81ltz22lki131.png?auto=webp&s=2eabd65034f525168fd3143a80c808ba0c7b215e') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+            margin: 0;
+            padding-top: 20px;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+
+        header {
+            padding: 1rem;
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            border: 2px solid #4CAF50;
+            max-width: 1000px;
+            margin: 0 auto 20px;
+        }
+
+        .logo {
+            width: 800px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #4CAF50;
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cccccc;
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-buttons {
+            display: none;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid #4CAF50;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 0 #2d5a2e, 0 12px 20px rgba(0, 0, 0, 0.3);
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+        }
+
+        .game-card:hover {
+            border-color: #45a049;
+            transform: perspective(1000px) rotateX(5deg) rotateY(5deg) translateY(-8px);
+            box-shadow: 0 16px 0 #2d5a2e, 0 20px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-card:active {
+            transform: perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(4px);
+            box-shadow: 0 4px 0 #2d5a2e, 0 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card .emoji-container {
+            width: 100%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) translateZ(30px);
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover .emoji-container {
+            transform: perspective(1000px) translateZ(40px);
+        }
+
+        .game-card h2 {
+            color: #4CAF50;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .game-card p {
+            color: #cccccc;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .game-card .play-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+            transform-style: preserve-3d;
+            transform: perspective(1000px) translateZ(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 0 #2d5a2e, 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card .play-button:hover {
+            background: #45a049;
+            transform: perspective(1000px) translateZ(10px);
+            box-shadow: 0 3px 0 #2d5a2e, 0 5px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-card .play-button:active {
+            transform: perspective(1000px) translateZ(0);
+            box-shadow: 0 0 0 #2d5a2e, 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(30deg);
+            background: #ff4444;
+            color: white;
+            padding: 1rem 4rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            opacity: 1;
+            white-space: nowrap;
+        }
+
+        .disabled-card {
+            opacity: 0.7;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .disabled-card .emoji-container,
+        .disabled-card h2,
+        .disabled-card p,
+        .disabled-card .play-button {
+            opacity: 0.3;
+        }
+
+        .info-section {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 2rem;
+            margin-top: 4rem;
+            border-radius: 20px;
+        }
+
+        .info-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .info-card {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+            border: 1px solid #4CAF50;
+        }
+
+        .info-card i {
+            font-size: 2.5rem;
+            color: #4CAF50;
+            margin-bottom: 1rem;
+            font-family: 'Font Awesome 6 Free' !important;
+        }
+
+        .info-card h3 {
+            color: #4CAF50;
+            margin-bottom: 1rem;
+        }
+
+        .info-card p {
+            color: #cccccc;
+            line-height: 1.6;
+        }
+
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 4rem;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .social-links a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .social-links a:hover {
+            color: #45a049;
+        }
+
+        .social-links a i {
+            font-family: 'Font Awesome 6 Brands' !important;
+            font-size: 1.5rem;
+        }
+
+        .diamond-balance {
+            position: fixed;
+            top: 40px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 25px;
+            border-radius: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: 2px solid #4CAF50;
+            font-family: 'Minecraft', sans-serif !important;
+            font-size: 1.4rem;
+            line-height: 1;
+            min-width: 156px;
+            justify-content: center;
+        }
+
+        .diamond-balance span {
+            display: inline-block;
+        }
+
+        .diamond-balance img {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        .diamond-balance.decrease {
+            border-color: #ff0000;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        .diamond-balance.increase {
+            border-color: #4CAF50;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        @keyframes balanceShake {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            75% { transform: scale(0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .games-grid {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="diamond-balance">
+        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Diamond_JE2_BE2.png/revision/latest?cb=20200128025341" alt="Diamond">
+        <span id="diamond-balance">1000</span>
+    </div>
+
+    <header>
+        <img src="assets/creeper-bet-logo-v2.png" alt="CreeperBet Logo" class="logo">
+        <p class="subtitle">O melhor site de apostas do Minecraft!</p>
+    </header>
+
+    <main>
+        <div class="games-grid">
+            <a href="games/slot.html" class="game-card">
+                <div class="emoji-container">🎰</div>
+                <h2>Minecraft Slot Machine</h2>
+                <p>Teste sua sorte com este slot machine temático do Minecraft! Escolha sua aposta e tente ganhar diamantes!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+
+            <a href="games/crash.html" class="game-card">
+                <div class="emoji-container">💥</div>
+                <h2>Minecraft Crash</h2>
+                <p>O creeper está subindo! Quanto mais alto ele subir, maior será seu multiplicador. Mas cuidado, ele pode explodir a qualquer momento!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+
+            <a href="games/tower-blocks.html" class="game-card">
+                <div class="emoji-container">🏗️</div>
+                <h2>Tower Blocks</h2>
+                <p>Construa a torre mais alta possível! Cada bloco colocado aumenta sua aposta, mas um erro pode fazer tudo desmoronar!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+
+            <a href="games/diamond-clicker.html" class="game-card">
+                <div class="emoji-container">👆</div>
+                <h2>Diamond Clicker</h2>
+                <p>Clique o máximo que puder em 10 segundos! Cada clique dobra sua aposta, mas cuidado para não quebrar o mouse!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+
+            <a href="games/live.html" class="game-card">
+                <div class="emoji-container">🎥</div>
+                <h2>Apostas em Tempo Real</h2>
+                <p>Aposte em vídeos de YouTubers e partidas de Minecraft! Preveja quem vai postar ou vencer!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+
+            <a href="#" class="game-card disabled-card">
+                <div class="coming-soon-badge">Em Breve</div>
+                <div class="emoji-container">⛏️</div>
+                <h2>Diamond Crash</h2>
+                <p>Quantos diamantes o Steve vai encontrar antes de cair na lava? Aumente sua aposta enquanto ele continua minerando!</p>
+                <div class="play-button">Jogar Agora</div>
+            </a>
+        </div>
+
+        <section class="info-section">
+            <div class="info-container">
+                <div class="info-card">
+                    <i class="fa-solid fa-trophy"></i>
+                    <h3>Recompensas Diárias</h3>
+                    <p>Ganhe diamantes extras todos os dias apenas por acessar o site e participar dos jogos!</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-users"></i>
+                    <h3>Comunidade Ativa</h3>
+                    <p>Junte-se à nossa comunidade de jogadores e compartilhe suas experiências com outros fãs do Minecraft.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fa-solid fa-star"></i>
+                    <h3>Novidades</h3>
+                    <p>Novos jogos e atualizações são adicionados regularmente para manter a diversão sempre fresca!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Nenhum villager foi machucado na criação deste site</p>
+        <div class="social-links">
+            <a href="#"><i class="fa-brands fa-discord"></i></a>
+            <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#"><i class="fa-brands fa-twitter"></i></a>
+        </div>
+    </footer>
+
+    <script src="games/shared.js"></script>
+</body>
+</html> 

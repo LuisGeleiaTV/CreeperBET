@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Slot Machine - CreeperBet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('../fonts/Minecraft.ttf') format('truetype');
+        }
+
+        * {
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        body {
+            font-family: 'Minecraft', sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('https://picfiles.alphacoders.com/478/478314.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: -1;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            margin-top: 50px;
+        }
+
+        header h1 {
+            color: #4CAF50;
+            font-size: 3.2rem;
+            margin: 0;
+            text-shadow: 3px 3px 0 #2d5a2e, 5px 5px 0 rgba(0, 0, 0, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .slot-machine {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 8px 0 #2d5a2e, 0 12px 20px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slot-machine::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138');
+            background-size: 30px;
+            background-repeat: repeat;
+            opacity: 0.05;
+            pointer-events: none;
+        }
+
+        .slot-machine::after {
+            content: "🎮";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        .slot-machine p {
+            color: #cccccc;
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .slots-container {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+            box-shadow: inset 0 0 20px rgba(76, 175, 80, 0.2);
+        }
+
+        .slot {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            overflow: hidden;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .slot:hover {
+            transform: scale(1.05);
+        }
+
+        .slot::before {
+            content: "✨";
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        .slot img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .slot.spinning img {
+            animation: slotSpin 0.1s ease infinite;
+        }
+
+        @keyframes slotSpin {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes balanceShake {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            75% { transform: scale(0.8); }
+        }
+
+        .balance-increase {
+            color: #4CAF50;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        .balance-decrease {
+            color: #ff0000;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        .diamond-balance {
+            position: fixed;
+            top: 40px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 25px;
+            border-radius: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            border: 2px solid #4CAF50;
+            font-family: 'Minecraft', sans-serif !important;
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .diamond-balance span {
+            display: inline-block;
+        }
+
+        .diamond-balance img {
+            width: 24px;
+            height: 24px;
+            display: block;
+        }
+
+        .diamond-balance.decrease {
+            border-color: #ff0000;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        .diamond-balance.increase {
+            border-color: #4CAF50;
+            animation: balanceShake 0.3s ease-in-out;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+        }
+
+        .bet-input {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #4CAF50;
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 10px;
+            width: 120px;
+            text-align: left;
+            padding-left: 20px;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #45a049;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 2px 2px 0 #2d5a2e, 3px 3px 0 rgba(0, 0, 0, 0.8);
+            font-family: 'Minecraft', sans-serif !important;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button span {
+            display: inline-block;
+        }
+
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .button:active {
+            transform: translateY(1px);
+        }
+
+        .button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid #4CAF50;
+            text-align: center;
+            z-index: 1000;
+            animation: popupFadeIn 0.3s ease;
+            box-shadow: 0 8px 0 #2d5a2e, 0 12px 20px rgba(0, 0, 0, 0.3);
+            min-width: 300px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .popup.active {
+            opacity: 1;
+        }
+
+        .popup.lose {
+            border-color: #ff0000;
+        }
+
+        .popup.lose h2 {
+            color: #ff0000;
+        }
+
+        .popup.win {
+            border-color: #4CAF50;
+        }
+
+        .popup.win h2 {
+            color: #4CAF50;
+        }
+
+        .popup-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .popup h2 {
+            font-size: 2.2em;
+            margin: 0;
+            line-height: 1;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+            transform: translateY(-12px);
+            display: inline-block;
+        }
+
+        .popup p {
+            color: #cccccc;
+            margin: 0;
+            font-family: 'Minecraft', sans-serif !important;
+            line-height: 1.4;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+            transform: translateY(-12px);
+            display: inline-block;
+            font-size: 1.2em;
+        }
+
+        .popup button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+            font-family: 'Minecraft', sans-serif !important;
+            line-height: 1;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .popup button span {
+            display: inline-block;
+        }
+
+        .popup button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .popup button:active {
+            transform: translateY(0);
+        }
+
+        @keyframes popupFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .celebration-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid #00aa00;
+            z-index: 1000;
+            animation: popup 0.5s ease-out;
+            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+            text-align: center;
+        }
+
+        .celebration-popup h2 {
+            color: #00aa00;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 170, 0, 0.5);
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        .celebration-popup p {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #cccccc;
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        .celebration-popup::before {
+            content: "🎉";
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            font-size: 40px;
+            animation: bounce 1s infinite;
+        }
+
+        .celebration-popup::after {
+            content: "🎉";
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 40px;
+            animation: bounce 1s infinite 0.5s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .slot.spinning::before {
+            content: "✨";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            opacity: 0.8;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .balance-container img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .multipliers-table {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            border: 3px solid #4CAF50;
+            padding: 15px;
+            color: white;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.2);
+            width: 100%;
+            position: relative;
+        }
+
+        .multipliers-table::before {
+            content: "🎯";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        .multipliers-table h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #2d5a2e, 3px 3px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .multipliers-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow-x: auto;
+            padding: 8px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            justify-content: center;
+        }
+
+        .multipliers-grid::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .multiplier-item {
+            width: 90px;
+        }
+
+        .multiplier-item img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .multiplier-info .name {
+            font-size: 1em;
+            margin-bottom: 2px;
+            transform: translateY(-6px);
+        }
+
+        .multiplier-info .value {
+            font-size: 0.9em;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin-top: 2px;
+            transform: translateY(-6px);
+        }
+
+        .falling-mineral {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            animation: fall linear forwards;
+        }
+
+        .falling-mineral img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .multipliers-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .multipliers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #4CAF50;
+            opacity: 0.7;
+            animation: confetti 3s linear forwards;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .music-controls button {
+            background: rgba(0, 0, 0, 0.8);
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-family: 'Minecraft', sans-serif !important;
+            transition: all 0.3s ease;
+        }
+        
+        .music-controls button:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .music-controls button.playing {
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .welcome-overlay {
+            display: none; /* Esconde completamente */
+        }
+
+        .welcome-overlay.hidden {
+            display: none;
+        }
+
+        .welcome-overlay h2 {
+            display: none;
+        }
+
+        .welcome-overlay p {
+            display: none;
+        }
+
+        .welcome-overlay .enter-button {
+            display: none;
+        }
+
+        /* Estilos para o popup de vitória detalhado */
+        .win-details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .win-mineral {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin-bottom: 10px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .win-details p {
+            margin: 5px 0;
+            font-size: 1.1em;
+        }
+
+        .win-details strong {
+            color: #4CAF50;
+            font-size: 1.2em;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="diamond-balance" onclick="showDiamondShop()">
+        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Diamond_JE2_BE2.png/revision/latest?cb=20200128025341" alt="Diamond">
+        <span id="diamond-balance">1000</span>
+    </div>
+
+    <header>
+        <a href="../index.html" class="back-button">
+            Voltar
+        </a>
+        <h1>Minecraft Slot Machine</h1>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div class="slot-machine">
+                <p>Teste sua sorte na slot machine do Minecraft! Escolha sua aposta e tente ganhar diamantes combinando os minérios raros!</p>
+                
+                <div class="slots-container">
+                    <div class="slot">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138" alt="Diamond">
+                    </div>
+                    <div class="slot">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138" alt="Diamond">
+                    </div>
+                    <div class="slot">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138" alt="Diamond">
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <input type="number" class="bet-input" placeholder="Aposta" min="1">
+                    <button class="button" onclick="spin()"><span>Começar</span></button>
+                </div>
+            </div>
+
+            <div class="multipliers-table">
+                <h3>Multiplicadores de Ganho</h3>
+                <div class="multipliers-grid">
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/43/Lapis_Lazuli_JE2_BE2.png/revision/latest/scale-to-width-down/75?cb=20190430045315" alt="Lapis">
+                        <div class="multiplier-info">
+                            <div class="name">Lápis</div>
+                            <div class="value">1x sua aposta</div>
+                        </div>
+                    </div>
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/fc/Iron_Ingot_JE3_BE2.png/revision/latest/scale-to-width-down/75?cb=20230613175240" alt="Iron">
+                        <div class="multiplier-info">
+                            <div class="name">Ferro</div>
+                            <div class="value">2x sua aposta</div>
+                        </div>
+                    </div>
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8a/Gold_Ingot_JE4_BE2.png/revision/latest/scale-to-width-down/75?cb=20200224211607" alt="Gold">
+                        <div class="multiplier-info">
+                            <div class="name">Ouro</div>
+                            <div class="value">3x sua aposta</div>
+                        </div>
+                    </div>
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/26/Netherite_Ingot_JE1_BE2.png/revision/latest/scale-to-width-down/75?cb=20220318055311" alt="Netherite">
+                        <div class="multiplier-info">
+                            <div class="name">Netherite</div>
+                            <div class="value">4x sua aposta</div>
+                        </div>
+                    </div>
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/26/Emerald_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20191229174220" alt="Emerald">
+                        <div class="multiplier-info">
+                            <div class="name">Esmeralda</div>
+                            <div class="value">5x sua aposta</div>
+                        </div>
+                    </div>
+                    <div class="multiplier-item">
+                        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138" alt="Diamond">
+                        <div class="multiplier-info">
+                            <div class="name">Diamante</div>
+                            <div class="value">6x sua aposta</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="celebration-popup" id="celebration">
+        <h2>🎉 PARABÉNS! 🎉</h2>
+        <p>Você ganhou <span id="win-amount">0</span> diamantes!</p>
+        <p>Multiplicador: <span id="multiplier">0</span>x</p>
+    </div>
+
+    <audio id="background-music" loop>
+        <source src="../sounds/slot-background.mp3" type="audio/mp3">
+        <source src="../sounds/slot-background.ogg" type="audio/ogg">
+        Seu navegador não suporta áudio HTML5.
+    </audio>
+
+    <audio id="slot-sound">
+        <source src="../sounds/slot-machine.mp3" type="audio/mp3">
+        <source src="../sounds/slot-machine.ogg" type="audio/ogg">
+        Seu navegador não suporta áudio HTML5.
+    </audio>
+    
+    <audio id="win-sound">
+        <source src="../sounds/slot-win.mp3" type="audio/mp3">
+        <source src="../sounds/slot-win.ogg" type="audio/ogg">
+        Seu navegador não suporta áudio HTML5.
+    </audio>
+    
+    <audio id="lose-sound">
+        <source src="../sounds/slot-lose.mp3" type="audio/mp3">
+        <source src="../sounds/slot-lose.ogg" type="audio/ogg">
+        Seu navegador não suporta áudio HTML5.
+    </audio>
+
+    <div id="music-controls" class="music-controls">
+        <button id="toggle-music">🔊 Ativar Música</button>
+    </div>
+
+    <script src="shared.js"></script>
+    <script>
+        const symbols = [
+            { name: 'lapis', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/4/43/Lapis_Lazuli_JE2_BE2.png/revision/latest/scale-to-width-down/75?cb=20190430045315', multiplier: 1 },
+            { name: 'iron', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/f/fc/Iron_Ingot_JE3_BE2.png/revision/latest/scale-to-width-down/75?cb=20230613175240', multiplier: 2 },
+            { name: 'gold', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/8/8a/Gold_Ingot_JE4_BE2.png/revision/latest/scale-to-width-down/75?cb=20200224211607', multiplier: 3 },
+            { name: 'netherite', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/26/Netherite_Ingot_JE1_BE2.png/revision/latest/scale-to-width-down/75?cb=20220318055311', multiplier: 4 },
+            { name: 'emerald', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/2/26/Emerald_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20191229174220', multiplier: 5 },
+            { name: 'diamond', image: 'https://static.wikia.nocookie.net/minecraft_gamepedia/images/a/ab/Diamond_JE3_BE3.png/revision/latest/scale-to-width-down/75?cb=20230924193138', multiplier: 6 }
+        ];
+
+        let isSpinning = false;
+        const betInput = document.querySelector('.bet-input');
+        const spinButton = document.querySelector('.button');
+        const slots = document.querySelectorAll('.slot');
+
+        function spin() {
+            if (isSpinning) return;
+            
+            const bet = parseInt(betInput.value);
+            if (!bet || bet < 1) {
+                alert('Por favor, insira uma aposta válida!');
+                return;
+            }
+
+            const balance = getDiamondBalance();
+            if (bet > balance) {
+                alert('Saldo insuficiente!');
+                return;
+            }
+
+            // Tocar o som de slot machine
+            const slotSound = document.getElementById('slot-sound');
+            slotSound.currentTime = 0;
+            slotSound.play();
+
+            isSpinning = true;
+            spinButton.disabled = true;
+            betInput.disabled = true;
+
+            // Deduct bet amount and update display immediately
+            const newBalance = balance - bet;
+            const balanceElement = document.querySelector('.diamond-balance');
+            balanceElement.classList.add('decrease');
+            setTimeout(() => balanceElement.classList.remove('decrease'), 300);
+            updateDiamondBalance(newBalance);
+
+            // Generate random results
+            const results = [];
+            for (let i = 0; i < 3; i++) {
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                results.push(randomSymbol);
+            }
+
+            // Animate all slots at once
+            let spins = 0;
+            const maxSpins = 30;
+            const spinInterval = 100;
+            let slotsFinished = 0;
+
+            // Add spinning class to all slots
+            slots.forEach(slot => slot.classList.add('spinning'));
+
+            // Create individual intervals for each slot
+            const slotIntervals = Array.from(slots).map((slot, index) => {
+                return setInterval(() => {
+                    const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                    slot.innerHTML = `<img src="${randomSymbol.image}" alt="${randomSymbol.name}">`;
+                }, spinInterval);
+            });
+
+            // Wait 4 seconds before starting to stop slots (reduzido de 5 segundos)
+            setTimeout(() => {
+                // Stop slots one by one with 1 second delay (reduzido de 2 segundos)
+                slots.forEach((slot, index) => {
+                    setTimeout(() => {
+                        clearInterval(slotIntervals[index]);
+                        slot.innerHTML = `<img src="${results[index].image}" alt="${results[index].name}">`;
+                        slot.classList.remove('spinning');
+                        slotsFinished++;
+                        
+                        if (slotsFinished === slots.length) {
+                            // All slots finished
+                            isSpinning = false;
+                            spinButton.disabled = false;
+                            betInput.disabled = false;
+
+                            // Check for wins
+                            const allSame = results.every(symbol => symbol.name === results[0].name);
+                            if (allSame) {
+                                const winAmount = bet * results[0].multiplier;
+                                const finalBalance = getDiamondBalance() + winAmount;
+                                const balanceElement = document.querySelector('.diamond-balance');
+                                balanceElement.classList.add('increase');
+                                setTimeout(() => balanceElement.classList.remove('increase'), 300);
+                                updateDiamondBalance(finalBalance);
+                                
+                                // Popup de vitória com detalhes sobre o minério e multiplicador
+                                const minerioNome = results[0].name.charAt(0).toUpperCase() + results[0].name.slice(1);
+                                showPopup('Parabéns!', `
+                                    <div class="win-details">
+                                        <img src="${results[0].image}" alt="${results[0].name}" class="win-mineral">
+                                        <p>Você conseguiu 3x ${minerioNome}!</p>
+                                        <p>Multiplicador: <strong>${results[0].multiplier}x</strong></p>
+                                        <p>Aposta: <strong>${bet} diamantes</strong></p>
+                                        <p>Ganho: <strong>${winAmount} diamantes</strong></p>
+                                    </div>
+                                `);
+                            } else {
+                                showPopup('Que pena!', `Você perdeu ${bet} diamantes!`);
+                            }
+                        }
+                    }, index * 1000); // Intervalo de 1 segundo entre os slots
+                });
+            }, 4000); // 4 segundos antes de iniciar a parada
+        }
+
+        function showPopup(title, message) {
+            // Criar o overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'popup-overlay';
+            document.body.appendChild(overlay);
+
+            // Criar o popup
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            
+            if (title === 'Que pena!') {
+                // Tocar som de derrota
+                const loseSound = document.getElementById('lose-sound');
+                loseSound.currentTime = 0;
+                loseSound.play();
+                
+                popup.classList.add('lose');
+                popup.innerHTML = `
+                    <div class="popup-content">
+                        <h2>😢 ${title}</h2>
+                        <p>${message}</p>
+                        <button onclick="closePopup(this)"><span>OK</span></button>
+                    </div>
+                `;
+            } else {
+                // Tocar som de vitória
+                const winSound = document.getElementById('win-sound');
+                winSound.currentTime = 0;
+                winSound.play();
+                
+                popup.classList.add('win');
+                
+                // Criar o confetti para celebrar a vitória
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                    confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(confetti);
+                    
+                    confetti.addEventListener('animationend', () => {
+                        confetti.remove();
+                    });
+                }
+                
+                popup.innerHTML = `
+                    <div class="popup-content">
+                        <h2>🎉 ${title}</h2>
+                        ${message}
+                        <button onclick="closePopup(this)"><span>OK</span></button>
+                    </div>
+                `;
+            }
+            
+            document.body.appendChild(popup);
+
+            // Ativar o fade
+            setTimeout(() => {
+                overlay.classList.add('active');
+                popup.classList.add('active');
+            }, 10);
+        }
+
+        function closePopup(button) {
+            const popup = button.closest('.popup');
+            const overlay = document.querySelector('.popup-overlay');
+            
+            // Remover as classes active
+            popup.classList.remove('active');
+            overlay.classList.remove('active');
+            
+            // Remover os elementos após a animação
+            setTimeout(() => {
+                popup.remove();
+                overlay.remove();
+            }, 300);
+        }
+
+        // Initialize game
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDiamondDisplay();
+            
+            // Iniciar a chuva de minerais
+            function createFallingMineral() {
+                const mineral = document.createElement('div');
+                mineral.className = 'falling-mineral';
+                const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+                mineral.innerHTML = `<img src="${randomSymbol.image}" alt="${randomSymbol.name}">`;
+                mineral.style.left = Math.random() * 100 + 'vw';
+                mineral.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                document.body.appendChild(mineral);
+                
+                // Remover o mineral após a animação
+                mineral.addEventListener('animationend', () => {
+                    mineral.remove();
+                });
+            }
+
+            // Criar minerais caindo periodicamente
+            setInterval(createFallingMineral, 500);
+        });
+
+        // Código para iniciar e controlar a música
+        document.addEventListener('DOMContentLoaded', function() {
+            const backgroundMusic = document.getElementById('background-music');
+            const toggleMusicButton = document.getElementById('toggle-music');
+            let isMusicPlaying = false;
+            let firstInteraction = true;
+            
+            // Esconde o botão de música inicialmente, mostra apenas após música começar
+            toggleMusicButton.style.display = 'none';
+            
+            toggleMusicButton.addEventListener('click', function() {
+                if (isMusicPlaying) {
+                    backgroundMusic.pause();
+                    toggleMusicButton.textContent = '🔊 Ativar Música';
+                    toggleMusicButton.classList.remove('playing');
+                    isMusicPlaying = false;
+                } else {
+                    playMusic();
+                }
+            });
+            
+            // Função para iniciar a música
+            function playMusic() {
+                if (!firstInteraction) return; // Previne múltiplas tentativas
+                
+                firstInteraction = false;
+                backgroundMusic.volume = 0.15; // Volume reduzido em 50% (metade de 0.3)
+                backgroundMusic.play()
+                    .then(() => {
+                        toggleMusicButton.textContent = '🔈 Desativar Música';
+                        toggleMusicButton.classList.add('playing');
+                        isMusicPlaying = true;
+                        toggleMusicButton.style.display = 'block';
+                    })
+                    .catch(error => {
+                        console.log("Reprodução automática bloqueada:", error);
+                        // Reativa a flag caso ocorra erro
+                        firstInteraction = true;
+                        toggleMusicButton.style.display = 'block';
+                    });
+            }
+            
+            // Adiciona eventos para detectar qualquer interação
+            document.addEventListener('click', playMusic, { once: true });
+            document.addEventListener('keydown', playMusic, { once: true });
+            document.addEventListener('touchstart', playMusic, { once: true });
+            
+            // Tenta iniciar a música com movimento do mouse
+            document.addEventListener('mousemove', function mouseHandler() {
+                playMusic();
+                // Remove este event listener após a primeira execução
+                document.removeEventListener('mousemove', mouseHandler);
+            });
+            
+            // Controle de música usando tecla M
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'm' || event.key === 'M') {
+                    toggleMusicButton.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

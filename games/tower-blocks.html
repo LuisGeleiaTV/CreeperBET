@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower Blocks - CreeperBet</title>
+    <link rel="stylesheet" href="shared.css">
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('../fonts/Minecraft.ttf') format('truetype');
+        }
+
+        * {
+            font-family: 'Minecraft', sans-serif !important;
+        }
+
+        body {
+            background: #63a562;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-image: url('../assets/village-background.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 60px auto 10px;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            color: #4d2a1a;
+            font-size: 2.8rem;
+            text-align: center;
+            text-shadow: 2px 2px 0 #f2bb67, 4px 4px 0 rgba(0, 0, 0, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .game-description {
+            background: rgba(73, 40, 16, 0.8);
+            color: #f2bb67;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 3px solid #f2bb67;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 0.9rem;
+        }
+
+        .game-area {
+            background: rgba(73, 40, 16, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 5px solid #794c28;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: grid;
+            grid-template-columns: 1fr 250px;
+            gap: 20px;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .tower-container {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 0;
+            height: 75vh;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .tower-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tower-block {
+            width: 64px;
+            height: 64px;
+            background-size: 100% 100% !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            border: none;
+            position: relative;
+            transition: all 0.3s ease;
+            image-rendering: pixelated;
+            margin-bottom: -1px;
+        }
+
+        .tower-block.current {
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .tower-block.shake {
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-5px) translateY(0); }
+            75% { transform: translateX(5px) translateY(0); }
+        }
+
+        .tower-block.fallen {
+            animation: fall 0.5s forwards;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
+        }
+
+        .game-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .game-button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+        }
+
+        .game-button:hover {
+            background: #598e3c;
+            transform: translateY(-3px);
+            box-shadow: 0 7px 0 #2d5a2e;
+        }
+
+        .game-button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #2d5a2e;
+        }
+
+        .game-button:disabled {
+            background: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 0 #555;
+        }
+
+        .game-button.continue {
+            background: #4d7a32;
+        }
+
+        .game-button.cashout {
+            background: #f2bb67;
+            box-shadow: 0 4px 0 #794c28;
+        }
+
+        .game-button.cashout:hover {
+            background: #FDB813;
+            box-shadow: 0 7px 0 #794c28;
+        }
+
+        .game-button.cashout:active {
+            box-shadow: 0 2px 0 #794c28;
+        }
+
+        .bet-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bet-input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            background: rgba(242, 187, 103, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 5px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #f2bb67;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .result-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(73, 40, 16, 0.95);
+            border: 5px solid #f2bb67;
+            border-radius: 15px;
+            padding: 20px;
+            z-index: 1000;
+            text-align: center;
+            min-width: 300px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-popup.show {
+            display: block;
+            animation: popupShow 0.5s ease-out;
+        }
+
+        @keyframes popupShow {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .result-title {
+            color: #f2bb67;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .result-details {
+            color: #f2eada;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .result-button {
+            background: #f2bb67;
+            color: #4d2a1a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .result-button:hover {
+            background: #FDB813;
+            transform: translateY(-2px);
+        }
+
+        /* Estilos para os desafios de reflexo */
+        .reflex-challenge {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(73, 40, 16, 0.95);
+            border: 5px solid #f2bb67;
+            border-radius: 15px;
+            padding: 30px;
+            z-index: 1000;
+            text-align: center;
+            min-width: 300px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .reflex-challenge.show {
+            display: block;
+            animation: challengeShow 0.3s ease-out;
+        }
+
+        @keyframes challengeShow {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .challenge-title {
+            color: #f2bb67;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .challenge-instruction {
+            color: #f2eada;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .challenge-timer {
+            color: #f44336;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .challenge-button {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #4CAF50;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 10px;
+            display: inline-block;
+            position: relative;
+            z-index: 1001;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .challenge-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .challenge-button.clicked {
+            background: #45a049;
+            transform: scale(0.95);
+        }
+
+        .challenge-button.red {
+            background: #f44336;
+        }
+
+        .challenge-button.green {
+            background: #4CAF50;
+        }
+
+        .challenge-key {
+            display: inline-block;
+            background: #f2bb67;
+            color: #4d2a1a;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .challenge-buttons-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            min-height: 200px;
+            position: relative;
+        }
+
+        .challenge-result {
+            color: #f2eada;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .challenge-result.show {
+            display: block;
+            animation: resultShow 0.3s ease-out;
+        }
+
+        @keyframes resultShow {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .challenge-result.success {
+            color: #4CAF50;
+        }
+
+        .challenge-result.failure {
+            color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="diamond-balance" onclick="addTemporaryDiamonds()">
+        <img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/6/6a/Diamond_JE2_BE2.png/revision/latest?cb=20200128025341" alt="Diamond">
+        <span id="diamond-balance">1000</span>
+    </div>
+
+    <a href="../index.html" class="back-button">
+        Voltar
+    </a>
+    
+    <div class="main-container">
+        <h1 class="main-title">Torre de Blocos</h1>
+        
+        <div class="game-description">
+            Construa sua torre andar por andar. Cada andar aumenta o multiplicador, mas também o risco de desmoronar. Se cair, perde tudo. Se parar, saca os diamantes!
+        </div>
+
+        <!-- Área do jogo -->
+        <div class="game-area">
+            <!-- Torre -->
+            <div class="tower-container" id="towerContainer">
+                <!-- Blocos serão adicionados via JavaScript -->
+            </div>
+
+            <!-- Container de controles -->
+            <div class="controls-container">
+                <!-- Informações do jogo -->
+                <div class="game-info">
+                    <div class="info-item">
+                        <div class="info-label">Andar Atual</div>
+                        <div class="info-value" id="currentFloor">0</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Multiplicador</div>
+                        <div class="info-value" id="currentMultiplier">1.0x</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Ganho Potencial</div>
+                        <div class="info-value" id="potentialWin">0</div>
+                    </div>
+                </div>
+
+                <!-- Controles de aposta -->
+                <div class="bet-container">
+                    <input type="number" id="bet-amount" class="bet-input" placeholder="Apostar diamantes" min="1">
+                    <button id="place-bet-btn" class="game-button">Apostar</button>
+                </div>
+
+                <!-- Controles do jogo -->
+                <div class="game-controls">
+                    <button id="continue-btn" class="game-button continue" disabled>Subir Bloco</button>
+                    <button id="cashout-btn" class="game-button cashout" disabled>Parar e Sacar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="result-popup" id="resultPopup">
+        <h2 class="result-title" id="resultTitle"></h2>
+        <div class="result-details" id="resultDetails"></div>
+        <button class="result-button" onclick="restartGame()">Jogar Novamente</button>
+    </div>
+
+    <!-- Adicionar o container de desafios antes do fechamento do body -->
+    <div class="reflex-challenge" id="reflexChallenge">
+        <h2 class="challenge-title" id="challengeTitle"></h2>
+        <div class="challenge-instruction" id="challengeInstruction"></div>
+        <div class="challenge-timer" id="challengeTimer"></div>
+        <div class="challenge-buttons-container" id="challengeButtonsContainer"></div>
+        <div class="challenge-result" id="challengeResult"></div>
+    </div>
+
+    <script src="shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initGame();
+        });
+
+        // Elementos do DOM
+        const towerContainer = document.getElementById('towerContainer');
+        const betAmountInput = document.getElementById('bet-amount');
+        const placeBetBtn = document.getElementById('place-bet-btn');
+        const continueBtn = document.getElementById('continue-btn');
+        const cashoutBtn = document.getElementById('cashout-btn');
+        const currentFloorDisplay = document.getElementById('currentFloor');
+        const currentMultiplierDisplay = document.getElementById('currentMultiplier');
+        const potentialWinDisplay = document.getElementById('potentialWin');
+        const resultPopup = document.getElementById('resultPopup');
+
+        // Estado do jogo
+        const gameState = {
+            betAmount: 0,
+            currentFloor: 0,
+            isPlaying: false,
+            currentBlock: null,
+            lastClickTime: 0,
+            multipliers: [
+                0.3, 0.5, 0.7, 1.0, 1.5, 2.0, 3.0, 5.0, 7.0, 10.0
+            ],
+            blockTypes: [
+                'dirt.webp',
+                'stone.webp',
+                'cobblestone.webp',
+                'birch_planks.webp',
+                'stone_bricks.webp',
+                'gold_block.webp',
+                'diamond_ore.webp',
+                'glowstone.webp',
+                'sponge.webp',
+                'oak_log.webp',
+                'quartz_block.webp',
+                'emerald_ore.webp',
+                'iron_ore.webp',
+                'end_stone.webp',
+                'polished_andesite.webp',
+                'smooth_stone.webp',
+                'ice.webp'
+            ],
+            loadedImages: {},
+            challengeTimeout: null,
+            challengeStartTime: null,
+            challengeType: null,
+            lastChallengeType: null,
+            difficulty: {
+                sequence: {
+                    length: 3,
+                    maxLength: 6
+                },
+                greenLight: {
+                    delay: 1000,
+                    minDelay: 300
+                },
+                keyPress: {
+                    time: 2000,
+                    minTime: 800,
+                    currentKeys: 1,
+                    maxKeys: 4
+                }
+            }
+        };
+
+        // Tipos de desafios
+        const challengeTypes = {
+            SEQUENCE_CLICK: 'sequence_click',
+            KEY_PRESS: 'key_press',
+            GREEN_LIGHT: 'green_light'
+        };
+
+        // Estado do desafio
+        let currentSequence = [];
+        let clickedButtons = new Set();
+
+        // Função para atualizar a UI
+        function updateUI() {
+            // Atualizar saldo
+            let balance = parseInt(localStorage.getItem('diamondBalance'));
+            if (isNaN(balance)) {
+                balance = 1000;
+                localStorage.setItem('diamondBalance', balance.toString());
+            }
+            document.getElementById('diamond-balance').textContent = balance;
+
+            // Atualizar displays
+            currentFloorDisplay.textContent = gameState.currentFloor;
+            const multiplier = gameState.currentFloor === 0 ? 0.5 : gameState.multipliers[gameState.currentFloor];
+            currentMultiplierDisplay.textContent = multiplier.toFixed(1) + 'x';
+            potentialWinDisplay.textContent = Math.floor(gameState.betAmount * multiplier);
+        }
+
+        // Função para criar um novo bloco
+        function createBlock() {
+            const block = document.createElement('div');
+            block.className = 'tower-block';
+            
+            // Escolhe um bloco aleatório
+            const randomBlock = gameState.blockTypes[Math.floor(Math.random() * gameState.blockTypes.length)];
+            const fullPath = `../assets/blocks/${randomBlock}`;
+            
+            // Define o background com a imagem
+            block.style.backgroundImage = `url('${fullPath}')`;
+            
+            if (gameState.currentFloor > 0) {
+                block.classList.add('current');
+            }
+            return block;
+        }
+
+        // Função para verificar se o bloco caiu
+        function checkBlockFall() {
+            const currentTime = Date.now();
+            const timeSinceLastClick = currentTime - gameState.lastClickTime;
+            
+            // Verificar delay mínimo entre cliques
+            if (timeSinceLastClick < 500) {
+                return false;
+            }
+
+            gameState.lastClickTime = currentTime;
+            return false;
+        }
+
+        // Função para atualizar a dificuldade baseada no andar
+        function updateDifficulty() {
+            // Aumentar comprimento da sequência (máximo 6)
+            gameState.difficulty.sequence.length = Math.min(
+                gameState.difficulty.sequence.maxLength,
+                3 + Math.floor(gameState.currentFloor / 3) // Aumenta 1 botão a cada 3 andares
+            );
+            
+            // Diminuir tempo do reflexo verde (mínimo 300ms)
+            gameState.difficulty.greenLight.delay = Math.max(
+                gameState.difficulty.greenLight.minDelay,
+                1000 * Math.pow(0.9, gameState.currentFloor) // Reduz 10% por andar
+            );
+            
+            // Diminuir tempo para pressionar tecla (mínimo 800ms)
+            gameState.difficulty.keyPress.time = Math.max(
+                gameState.difficulty.keyPress.minTime,
+                2000 * Math.pow(0.9, gameState.currentFloor) // Reduz 10% por andar
+            );
+        }
+
+        // Função para adicionar bloco à torre
+        function addBlock() {
+            const block = createBlock();
+            towerContainer.appendChild(block);
+            gameState.currentBlock = block;
+            gameState.currentFloor++;
+            // Atualizar dificuldade após adicionar bloco
+            updateDifficulty();
+            updateUI();
+        }
+
+        // Função para finalizar o jogo
+        function endGame(isWin) {
+            let currentBalance = parseInt(localStorage.getItem('diamondBalance'));
+            if (isNaN(currentBalance)) {
+                currentBalance = 1000;
+            }
+
+            if (isWin) {
+                const multiplier = gameState.currentFloor === 0 ? 0.5 : gameState.multipliers[gameState.currentFloor - 1];
+                const winAmount = Math.floor(gameState.betAmount * multiplier);
+                currentBalance += winAmount;
+                playSound('xp');
+                showResultPopup(true, winAmount);
+            } else {
+                currentBalance -= gameState.betAmount;
+                showResultPopup(false, gameState.betAmount);
+            }
+            
+            localStorage.setItem('diamondBalance', currentBalance.toString());
+            resetGame();
+        }
+
+        // Função para mostrar popup de resultado
+        function showResultPopup(isWin, amount) {
+            const title = document.getElementById('resultTitle');
+            const details = document.getElementById('resultDetails');
+            
+            if (isWin) {
+                title.textContent = '🎉 Vitória! 🎉';
+                title.style.color = '#4CAF50';
+                details.innerHTML = `<p>Você ganhou ${amount} diamantes!</p>`;
+            } else {
+                title.textContent = '💀 Derrota! 💀';
+                title.style.color = '#f44336';
+                details.innerHTML = `<p>Você perdeu ${amount} diamantes!</p>`;
+            }
+            
+            resultPopup.classList.add('show');
+        }
+
+        // Função para resetar o jogo
+        function resetGame() {
+            gameState.betAmount = 0;
+            gameState.currentFloor = 0;
+            gameState.isPlaying = false;
+            gameState.currentBlock = null;
+            gameState.lastClickTime = 0;
+            gameState.lastChallengeType = null;
+            
+            // Resetar dificuldade para valores iniciais
+            gameState.difficulty = {
+                sequence: {
+                    length: 3,
+                    maxLength: 6
+                },
+                greenLight: {
+                    delay: 1000,
+                    minDelay: 300
+                },
+                keyPress: {
+                    time: 2000,
+                    minTime: 800,
+                    currentKeys: 1,
+                    maxKeys: 4
+                }
+            };
+            
+            // Limpar torre
+            towerContainer.innerHTML = '';
+            
+            // Resetar UI
+            betAmountInput.value = '';
+            betAmountInput.disabled = false;
+            placeBetBtn.disabled = false;
+            continueBtn.disabled = true;
+            cashoutBtn.disabled = true;
+            
+            // Limpar desafio
+            const challenge = document.getElementById('reflexChallenge');
+            challenge.classList.remove('show');
+            if (gameState.challengeTimeout) {
+                clearTimeout(gameState.challengeTimeout);
+                gameState.challengeTimeout = null;
+            }
+            
+            updateUI();
+        }
+
+        // Função para tocar sons
+        function playSound(type) {
+            const audio = new Audio();
+            if (type === 'explosion') {
+                audio.src = '../assets/sounds/explosion.mp3';
+            } else if (type === 'xp') {
+                audio.src = '../assets/sounds/xp.mp3';
+            }
+            audio.play().catch(e => console.log('Erro ao tocar som:', e));
+        }
+
+        // Função temporária para adicionar diamantes
+        function addTemporaryDiamonds() {
+            let currentBalance = parseInt(localStorage.getItem('diamondBalance'));
+            if (isNaN(currentBalance)) {
+                currentBalance = 1000;
+            }
+            currentBalance += 1000;
+            localStorage.setItem('diamondBalance', currentBalance.toString());
+            updateUI();
+        }
+
+        // Expor funções para HTML
+        window.restartGame = function() {
+            resultPopup.classList.remove('show');
+            resetGame();
+        };
+        window.addTemporaryDiamonds = addTemporaryDiamonds;
+
+        // Inicializar o jogo
+        function initGame() {
+            // Adicionar eventos aos botões
+            placeBetBtn.addEventListener('click', () => {
+                const betAmount = parseInt(betAmountInput.value);
+                const currentBalance = parseInt(localStorage.getItem('diamondBalance') || '0');
+                
+                if (betAmount > 0 && betAmount <= currentBalance) {
+                    gameState.betAmount = betAmount;
+                    betAmountInput.disabled = true;
+                    placeBetBtn.disabled = true;
+                    continueBtn.disabled = false;
+                    cashoutBtn.disabled = false;
+                    addBlock();
+                } else {
+                    alert('Aposta inválida! Verifique seu saldo.');
+                }
+            });
+
+            continueBtn.addEventListener('click', () => {
+                startReflexChallenge();
+            });
+
+            cashoutBtn.addEventListener('click', () => {
+                endGame(true);
+            });
+        }
+
+        // Função para escolher um tipo de desafio aleatório
+        function chooseRandomChallengeType() {
+            const types = Object.values(challengeTypes);
+            let availableTypes = types.filter(type => type !== gameState.lastChallengeType);
+            
+            // Se não houver tipos disponíveis (caso do primeiro desafio), usar todos
+            if (availableTypes.length === 0) {
+                availableTypes = types;
+            }
+            
+            const randomIndex = Math.floor(Math.random() * availableTypes.length);
+            const chosenType = availableTypes[randomIndex];
+            gameState.lastChallengeType = chosenType;
+            return chosenType;
+        }
+
+        // Função para iniciar um desafio de reflexo
+        function startReflexChallenge() {
+            const challenge = document.getElementById('reflexChallenge');
+            const title = document.getElementById('challengeTitle');
+            const instruction = document.getElementById('challengeInstruction');
+            const timer = document.getElementById('challengeTimer');
+            const result = document.getElementById('challengeResult');
+
+            // Resetar elementos
+            result.style.display = 'none';
+            result.className = 'challenge-result';
+            clickedButtons.clear();
+
+            // Criar container de botões
+            let buttonsContainer = document.querySelector('.challenge-buttons-container');
+            if (!buttonsContainer) {
+                buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'challenge-buttons-container';
+                challenge.insertBefore(buttonsContainer, result);
+            }
+            buttonsContainer.innerHTML = '';
+
+            // Escolher tipo de desafio que não foi usado na última vez
+            gameState.challengeType = chooseRandomChallengeType();
+
+            // Desabilitar cliques nos botões do jogo durante o desafio
+            continueBtn.disabled = true;
+            cashoutBtn.disabled = true;
+
+            // Configurar desafio baseado no tipo
+            switch (gameState.challengeType) {
+                case challengeTypes.SEQUENCE_CLICK:
+                    title.textContent = 'Sequência de Cliques!';
+                    instruction.textContent = `Clique nos botões na ordem correta! (${gameState.difficulty.sequence.length} botões)`;
+                    
+                    // Gerar sequência aleatória
+                    currentSequence = Array.from({length: gameState.difficulty.sequence.length}, (_, i) => i + 1);
+                    
+                    // Definir áreas para cada botão
+                    const areas = [
+                        { x: 0, y: 0, width: 200, height: 200 },
+                        { x: 200, y: 0, width: 200, height: 200 },
+                        { x: 100, y: 200, width: 200, height: 200 },
+                        { x: 0, y: 200, width: 200, height: 200 },
+                        { x: 200, y: 200, width: 200, height: 200 },
+                        { x: 100, y: 0, width: 200, height: 200 }
+                    ];
+                    
+                    // Criar botões
+                    currentSequence.forEach((num, index) => {
+                        const button = document.createElement('button');
+                        button.className = 'challenge-button';
+                        button.textContent = num;
+                        
+                        const area = areas[index];
+                        const randomX = area.x + Math.random() * (area.width - 80);
+                        const randomY = area.y + Math.random() * (area.height - 80);
+                        
+                        button.style.position = 'absolute';
+                        button.style.left = randomX + 'px';
+                        button.style.top = randomY + 'px';
+                        
+                        button.onclick = () => handleSequenceClick(num, button);
+                        buttonsContainer.appendChild(button);
+                    });
+                    break;
+
+                case challengeTypes.KEY_PRESS:
+                    title.textContent = 'Tecla Rápida!';
+                    const keys = ['W', 'A', 'S', 'D'];
+                    const numKeys = gameState.difficulty.keyPress.currentKeys;
+                    const selectedKeys = [];
+                    
+                    // Selecionar teclas aleatórias
+                    while (selectedKeys.length < numKeys) {
+                        const randomKey = keys[Math.floor(Math.random() * keys.length)];
+                        if (!selectedKeys.includes(randomKey)) {
+                            selectedKeys.push(randomKey);
+                        }
+                    }
+                    
+                    instruction.textContent = `Pressione as teclas ${selectedKeys.join(', ')} em menos de ${(gameState.difficulty.keyPress.time/1000).toFixed(1)} segundos!`;
+                    
+                    // Criar display para cada tecla
+                    selectedKeys.forEach(key => {
+                        const keyDisplay = document.createElement('div');
+                        keyDisplay.className = 'challenge-key';
+                        keyDisplay.textContent = key;
+                        buttonsContainer.appendChild(keyDisplay);
+                    });
+                    
+                    // Remover listener anterior e adicionar novo
+                    document.removeEventListener('keydown', handleKeyPress);
+                    document.addEventListener('keydown', handleKeyPress);
+                    break;
+
+                case challengeTypes.GREEN_LIGHT:
+                    title.textContent = 'Reflexo Verde!';
+                    instruction.textContent = 'Clique no botão quando ele ficar verde!';
+                    
+                    const button = document.createElement('button');
+                    button.className = 'challenge-button red';
+                    button.textContent = '!';
+                    button.style.position = 'absolute';
+                    button.style.left = '50%';
+                    button.style.top = '50%';
+                    button.style.transform = 'translate(-50%, -50%)';
+                    
+                    button.onclick = () => {
+                        if (button.classList.contains('green')) {
+                            completeChallenge(true);
+                        } else {
+                            completeChallenge(false);
+                        }
+                    };
+                    
+                    buttonsContainer.appendChild(button);
+                    
+                    setTimeout(() => {
+                        button.className = 'challenge-button green';
+                        gameState.challengeStartTime = Date.now();
+                        startTimer();
+                    }, gameState.difficulty.greenLight.delay);
+                    break;
+            }
+
+            if (gameState.challengeTimeout) {
+                clearTimeout(gameState.challengeTimeout);
+                gameState.challengeTimeout = null;
+            }
+
+            if (gameState.challengeType !== challengeTypes.GREEN_LIGHT) {
+                gameState.challengeStartTime = Date.now();
+                startTimer();
+            }
+
+            challenge.classList.add('show');
+        }
+
+        // Função para lidar com clique na sequência
+        function handleSequenceClick(num, button) {
+            if (clickedButtons.has(num)) return;
+            
+            const expectedNum = currentSequence[clickedButtons.size];
+            if (num === expectedNum) {
+                clickedButtons.add(num);
+                button.classList.add('clicked');
+                
+                if (clickedButtons.size === currentSequence.length) {
+                    completeChallenge(true);
+                }
+            } else {
+                completeChallenge(false);
+            }
+        }
+
+        // Função para lidar com pressionamento de tecla
+        function handleKeyPress(event) {
+            const keyDisplays = document.querySelectorAll('.challenge-key');
+            const pressedKey = event.key.toUpperCase();
+            
+            // Verificar se a tecla pressionada corresponde a alguma das teclas esperadas
+            for (const keyDisplay of keyDisplays) {
+                if (keyDisplay.textContent === pressedKey) {
+                    keyDisplay.style.opacity = '0.5';
+                    keyDisplay.style.transform = 'scale(0.9)';
+                    
+                    // Verificar se todas as teclas foram pressionadas
+                    const allPressed = Array.from(keyDisplays).every(display => display.style.opacity === '0.5');
+                    if (allPressed) {
+                        completeChallenge(true);
+                    }
+                    return;
+                }
+            }
+            
+            // Se a tecla pressionada não corresponde a nenhuma das esperadas, falha
+            completeChallenge(false);
+        }
+
+        // Função para completar o desafio
+        function completeChallenge(success) {
+            const result = document.getElementById('challengeResult');
+            const challenge = document.getElementById('reflexChallenge');
+
+            if (gameState.challengeTimeout) {
+                clearTimeout(gameState.challengeTimeout);
+                gameState.challengeTimeout = null;
+            }
+            document.removeEventListener('keydown', handleKeyPress);
+
+            // Reabilitar botões do jogo
+            continueBtn.disabled = false;
+            cashoutBtn.disabled = false;
+
+            if (success) {
+                result.textContent = 'Sucesso! Bloco adicionado!';
+                result.className = 'challenge-result show success';
+                playSound('xp');
+                
+                // Aumentar número de teclas se o desafio foi de tecla e foi bem sucedido
+                if (gameState.challengeType === challengeTypes.KEY_PRESS) {
+                    gameState.difficulty.keyPress.currentKeys = Math.min(
+                        gameState.difficulty.keyPress.maxKeys,
+                        gameState.difficulty.keyPress.currentKeys + 1
+                    );
+                }
+                
+                setTimeout(() => {
+                    challenge.classList.remove('show');
+                    addBlock();
+                }, 1000);
+            } else {
+                result.textContent = 'Falhou! Torre desmoronou!';
+                result.className = 'challenge-result show failure';
+                playSound('explosion');
+                setTimeout(() => {
+                    challenge.classList.remove('show');
+                    endGame(false);
+                }, 1000);
+            }
+        }
+
+        // Função para iniciar o timer do desafio
+        function startTimer() {
+            const timer = document.getElementById('challengeTimer');
+            const maxTime = gameState.challengeType === challengeTypes.KEY_PRESS ? 
+                gameState.difficulty.keyPress.time : 2000;
+            const updateInterval = 50;
+
+            function updateTimer() {
+                const elapsed = Date.now() - gameState.challengeStartTime;
+                const remaining = Math.max(0, maxTime - elapsed);
+                timer.textContent = (remaining / 1000).toFixed(1) + 's';
+
+                if (remaining <= 0) {
+                    completeChallenge(false);
+                } else {
+                    gameState.challengeTimeout = setTimeout(updateTimer, updateInterval);
+                }
+            }
+
+            updateTimer();
+        }
+    </script>
+</body>
+</html> 
